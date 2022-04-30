@@ -3,7 +3,7 @@ import telegram
 from bs4 import BeautifulSoup
 from apscheduler.schedulers.blocking import BlockingScheduler
 
-bot = telegram.Bot(token = 'tokenNo')
+bot = telegram.Bot(token = '5396545974:AAEZl9YZY8pF2jye_dcJh_0oR_IfyDBZNAU')
 url = 'http://www.cgv.co.kr/common/showtimes/iframeTheater.aspx?areacode=01&theatercode=0199&date=20220504'
 
 def job_function():
