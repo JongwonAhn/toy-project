@@ -59,10 +59,44 @@ nameSpace
   필요한 모든것은 시작시 실행될 명령어(run appName), 파일 스냅샷(디렉토리나 파일을 카피 한것)
   
 이미지로 컨테이너를 만드는 순서
-- 1. Docker 클라이언트에 docker tun Image 입력시
+- 1. Docker 클라이언트에 docker run Image 입력시
   2. 도커 이미지에 있는 파일 스냅샷을 컨테이너 하드 디스크에 옮겨 준다.
   3. 이미지에서 가지고 있는 명령어(컨테이너가 실행될때 사용될 명령어)를 이용해 해당app을 실행시킨다.
- 
+
+05/03 
+작동 순서 복습.
+- docker run 이미지이름 명령어 -> 도커 클라이언트 언급 / 컨테이너 생성 및 실행 / 이 컨테이너를 위한 이미지 / 이 자리는 이미지가 가지고 있는 시작명령어를 무시하고 커맨드 실행시킴.
+
+
+도커 명령어 및 생명주기
+docker ps (-a) -> docker process status 현재 도커컨테이너의 상태. (all)
+docker create 이미지 이름 -> 파일 스냅샷을 컨테이너 생성후 하드디스크로 옮김. 컨테이너 ID생성
+docker start 컨테이너ID/이름 -> 시작시 실행될 명령어 run이 실행됨.
+docker run -> 위의 두 가지 작업이 한번에 되는것.
+docker stop 컨테이너ID/이름 -> docker stop -> SIGTERM (Grace period.정리하는시간) -> SIGKILL -> Main Process
+docker kill 컨테이너ID/이름 -> docker kill ->         (Grace Period x 즉시멈춤)    SIGKILL -> Main Process
+docker rm ID/이름 (or `docker ps -a -q`) -> 중지된 컨테이너 삭제.
+docker rmi 이미지ID -> 이미지 삭제
+docker system prune -> 한번에 컨테이너, 이미지, 네트워크 모두 삭제. 도커를 쓰지 않을때 모두 정리할때 사용. 단, 실행중인 컨테이너에 영향x
+docker exeu 컨테이너ID 명령어 -> 이미 실행중인 컨테이너에 명령어 실행. run은 새 컨테이너를 만들고 실행. 
+ex) redis서버를 실행후, redis-cli를 실행하면, 컨테이너 밖에서 명령어가 실행되므로 작동하지 않는다.
+    이때 exce로 컨테이너 안에 들어가서 명령어를 주어야 한다. - docker it 컨테이너ID redis-cli -> redis-cli접속
+	-it -> interactive terminal. 명령어 실행후 계속 명령어 입력가능. -it가 없다면 redis-cli만 실행후 밖으로 나와버림.
+docker exeu -it 컨테이너ID sh -> 컨테이너 안에서 shell환경으로 직접 들어가 입력가능. 매번 docker~ 입력 불필요.(sh bash powershell...)
+
+지금까지는 도커서버에 있는 도커 이미지를 사용했다. 도커이미지를 직접 만들어보자.
+- Docker file작성 -> 도커클라이언트 전달 -> 도커서버 -> 이미지 생성
+  Docker file은 도커이미지를 만들기 위한 설정파일. 컨테이너가 어떻게 행동해야 하는지에 대한 설정정의.
+  Docker client 전달 후 도커서버에서 전달된 모든 중요한 작업을 한다.
+  - dockerfile 폴더 참고.
   
-  
-  
+베이스 이미지란?
+- 도커 이미지는 여러개의 레이어로 되어 있다. 그중 이 이미지의 기반이 되는 부분이다. OS에 대한 정보가 들어있다.
+
+WSL2에 설치된 Linux에서 Dockerfile 빌드시 step등 정보가 terminal에 온전히 보이지 않을때
+- buildkit 이 기존 도커엔진에서 제공하는 기능을 대채하여 발생.
+  도커 빌드전, DOCKER_BUILDKIT=0으로 Disable 시켜 빌드 실행.
+  또는 도커엔진의 설정에서 buildkit : false
+
+
+
