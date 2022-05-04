@@ -69,20 +69,20 @@ nameSpace
 
 
 도커 명령어 및 생명주기
-docker ps (-a) -> docker process status 현재 도커컨테이너의 상태. (all)
-docker create 이미지 이름 -> 파일 스냅샷을 컨테이너 생성후 하드디스크로 옮김. 컨테이너 ID생성
-docker start 컨테이너ID/이름 -> 시작시 실행될 명령어 run이 실행됨.
-docker run -> 위의 두 가지 작업이 한번에 되는것.
-docker stop 컨테이너ID/이름 -> docker stop -> SIGTERM (Grace period.정리하는시간) -> SIGKILL -> Main Process
-docker kill 컨테이너ID/이름 -> docker kill ->         (Grace Period x 즉시멈춤)    SIGKILL -> Main Process
-docker rm ID/이름 (or `docker ps -a -q`) -> 중지된 컨테이너 삭제.
-docker rmi 이미지ID -> 이미지 삭제
-docker system prune -> 한번에 컨테이너, 이미지, 네트워크 모두 삭제. 도커를 쓰지 않을때 모두 정리할때 사용. 단, 실행중인 컨테이너에 영향x
-docker exeu 컨테이너ID 명령어 -> 이미 실행중인 컨테이너에 명령어 실행. run은 새 컨테이너를 만들고 실행. 
+- docker ps (-a) -> docker process status 현재 도커컨테이너의 상태. (all)
+- docker create 이미지 이름 -> 파일 스냅샷을 컨테이너 생성후 하드디스크로 옮김. 컨테이너 ID생성
+- docker start 컨테이너ID/이름 -> 시작시 실행될 명령어 run이 실행됨.
+- docker run -> 위의 두 가지 작업이 한번에 되는것.
+- docker stop 컨테이너ID/이름 -> docker stop -> SIGTERM (Grace period.정리하는시간) -> SIGKILL -> Main Process
+- docker kill 컨테이너ID/이름 -> docker kill ->         (Grace Period x 즉시멈춤)    SIGKILL -> Main Process
+- docker rm ID/이름 (or `docker ps -a -q`) -> 중지된 컨테이너 삭제.
+- docker rmi 이미지ID -> 이미지 삭제
+- docker system prune -> 한번에 컨테이너, 이미지, 네트워크 모두 삭제. 도커를 쓰지 않을때 모두 정리할때 사용. 단, 실행중인 컨테이너에 영향x
+- docker exeu 컨테이너ID 명령어 -> 이미 실행중인 컨테이너에 명령어 실행. run은 새 컨테이너를 만들고 실행. 
 ex) redis서버를 실행후, redis-cli를 실행하면, 컨테이너 밖에서 명령어가 실행되므로 작동하지 않는다.
     이때 exce로 컨테이너 안에 들어가서 명령어를 주어야 한다. - docker it 컨테이너ID redis-cli -> redis-cli접속
 	-it -> interactive terminal. 명령어 실행후 계속 명령어 입력가능. -it가 없다면 redis-cli만 실행후 밖으로 나와버림.
-docker exeu -it 컨테이너ID sh -> 컨테이너 안에서 shell환경으로 직접 들어가 입력가능. 매번 docker~ 입력 불필요.(sh bash powershell...)
+- docker exeu -it 컨테이너ID sh -> 컨테이너 안에서 shell환경으로 직접 들어가 입력가능. 매번 docker~ 입력 불필요.(sh bash powershell...)
 
 지금까지는 도커서버에 있는 도커 이미지를 사용했다. 도커이미지를 직접 만들어보자.
 - Docker file작성 -> 도커클라이언트 전달 -> 도커서버 -> 이미지 생성
@@ -96,7 +96,48 @@ docker exeu -it 컨테이너ID sh -> 컨테이너 안에서 shell환경으로 �
 WSL2에 설치된 Linux에서 Dockerfile 빌드시 step등 정보가 terminal에 온전히 보이지 않을때
 - buildkit 이 기존 도커엔진에서 제공하는 기능을 대채하여 발생.
   도커 빌드전, DOCKER_BUILDKIT=0으로 Disable 시켜 빌드 실행.
-  또는 도커엔진의 설정에서 buildkit : false
+  또는 도커엔진의 설정에서 buildkit : false 로 변경
+  
+이미지를 만들때
+- 베이스 이미지를 먼저 임시 컨테이너에 넣은후, 그 임시 컨테이너를 토대로 새로운 이미지가 생성된다. 임시 컨테이너는 삭제된다.
+  이미지 -> 임시컨테이너(새로운 명령어, 파일스냅샷추가) -> 새로운 이미지
+  그렇기 떄문에 이미지ID가 만들어지고 지워지며, 새로운 이미지의ID가 최종.
+  
+도커 이미지에 이름 주는 방법.
+- docker build <-t 나의도커아이디 / 저장소/프로젝트이름 : 버전> ./
+  ex) docker build -t ajw9491/hello:latest ./ -> 도커이미지명으로 ajw9491/hello:latest 사용가능
+ 
+05/04
+도커 빌드시
+- 종속성을 설치하기 위해선 해당 베이지 이미지가 그 종속성을 설치할수 있는 파일을 갖고 있어야 한다.
+  ex) RUN npm install을 위해선 FROM node 를 사용하여야함.
+- 임시 컨테이너에서는 외부파일을 함께 빌드하지 않으므로, COPY ./ ./를 입력하여 함께 빌드한다.
 
+도커 빌드하여 이미지파일을 실행시켰는데 왜 로컬에서 접속이 안되나?
+- 네트워크도 위 처럼 로컬 네트워크에 있던것을 컨테이너 내부에 있는 네트워크에 연결시켜야 한다.
+  옵션 -p 5000 : 8080 -> -port 로컬port번호 : 컨테이너port번호 
+  로컬 포트번호와 컨테이너 포트번호를 맵핑하여, 로컬포트5000으로 접속시 컨테이너속 8080으로 접속한다.
+  ex) docker run -p 5000:8080 ajw9491/nodejs
 
+workdir을 설정해야 하는 이유.
+- workdir가 없이 build하게 될 경우, 모든 소스파일이 rootdir에 모이게 된다.
+  이는 소스파일이 많을경우 관리가 힘들어 지며, 같은 이름의 파일이 존재할 경우 덮어쓰여진다.
+  WORKDIR /usr/src/app 을 예시로 주면, docker run실행시 하위 디렉토리 부터 접근이 된다.
+  rootdir에 home, bin, dev 파일이, /usr 에는 src, /app 에는 .json, Dockerfile 등등 
+  쉘로 접속하여 ls, cd / 루트디렉토리로 접속하여 확인한다.
+  
+어플리케이션 소스변경으로 재빌드시, 효율적으로 하기
+- 변경된소스를 재빌드시, 종속성을 제외하고 빌드가 가능하다.
+  package.json과 같은 파일은 수정이 되지 않는한
+  다시 받을 필요가 없기 떄문에 기존에 빌드된 캐시를 그대로 사용하는게 효율적이다.
+  ex)RUN 실행전, COPY에 package.json ./ 을 추가하고, 기존 COPY를 RUN아래로 내린다. 
+     콘솔에서 도커 로그를 보면, --->Using cache로, 캐시를 이용해 빠르게 빌드된다.
+  -하지만 이마저도, 소스를 변경할때마다 변경된 소스부분을COPY한후 이미지를 다시 빌드하고 컨테이너를
+   다시실행해줘야지 변경된 소스가 화면에 반영된다. 이미지를 매번 새로 빌드하게 되므로 작업시간이 크다.
 
+Docker Volume이란?
+- 도커 컨에티너에서 Docker Volume을 이용하여 
+  기존의 COPY가 아닌 로컬에 있는파일을 Mapping하는것이다. 
+  ex) docker run -p 5000:8080 -v /usr/src/app/node_modules -v $(pwd):/usr/src/app imageId 
+      맥$(pwd) => 윈도우%cd% powerShell ${pwd}
+	  

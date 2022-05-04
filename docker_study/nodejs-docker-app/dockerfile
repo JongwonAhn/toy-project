@@ -1,0 +1,19 @@
+#alpine 이미지는 최소한의 경량화 파일이 들어있기때문에, npm을 위한 파일이 들어있지 않아서 RUN부분에 npm install을 할수가 없다
+# 그렇기 때문에 npm이 들어있는 baseImage중 하나가 node 이미지 이다.
+FROM node:10
+
+
+WORKDIR /usr/src/app
+
+#임시 컨테이너에는 package.json, server.js 파일이 없기 떄문에 오류가 난다. 로컬에 있는 이 파일을 ./으로 복사후 빌드 해야한다.
+# COPY ./ ./ -> 전체 파일을 적용할수 있다
+COPY package.json ./
+
+#npm 종속성 설치
+RUN npm install
+
+COPY ./ ./
+
+#노드 웹 서버를 작동시키려면 node + 엔트리 파일 이름을 입력해야 한다.
+#현재 엔트리 파일이 server.js이기 때문에 아래 적어준다.
+CMD ["node", "server.js"]
