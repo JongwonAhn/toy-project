@@ -165,4 +165,5 @@ Redis를 왜 쓰는건가?
  
 docker-compose.yml작성
  -yaml yml 파일은 XML,json처럼 데이터 형식 포맷이며, 좀 더 사람이 읽기 쉬운 포맷이다.
- 
+ -docker-compose.yml 파일 주석 참고.
+ -docker-compose up 로 실행.
