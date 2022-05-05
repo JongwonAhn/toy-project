@@ -119,3 +119,25 @@ WSL2에 설치된 Linux에서 Dockerfile 빌드시 step등 정보가 terminal에
   로컬 포트번호와 컨테이너 포트번호를 맵핑하여, 로컬포트5000으로 접속시 컨테이너속 8080으로 접속한다.
   ex) docker run -p 5000:8080 ajw9491/nodejs
 
+workdir을 설정해야 하는 이유.
+- workdir가 없이 build하게 될 경우, 모든 소스파일이 rootdir에 모이게 된다.
+  이는 소스파일이 많을경우 관리가 힘들어 지며, 같은 이름의 파일이 존재할 경우 덮어쓰여진다.
+  WORKDIR /usr/src/app 을 예시로 주면, docker run실행시 하위 디렉토리 부터 접근이 된다.
+  rootdir에 home, bin, dev 파일이, /usr 에는 src, /app 에는 .json, Dockerfile 등등 
+  쉘로 접속하여 ls, cd / 루트디렉토리로 접속하여 확인한다.
+  
+어플리케이션 소스변경으로 재빌드시, 효율적으로 하기
+- 변경된소스를 재빌드시, 종속성을 제외하고 빌드가 가능하다.
+  package.json과 같은 파일은 수정이 되지 않는한
+  다시 받을 필요가 없기 떄문에 기존에 빌드된 캐시를 그대로 사용하는게 효율적이다.
+  ex)RUN 실행전, COPY에 package.json ./ 을 추가하고, 기존 COPY를 RUN아래로 내린다. 
+     콘솔에서 도커 로그를 보면, --->Using cache로, 캐시를 이용해 빠르게 빌드된다.
+  -하지만 이마저도, 소스를 변경할때마다 변경된 소스부분을COPY한후 이미지를 다시 빌드하고 컨테이너를
+   다시실행해줘야지 변경된 소스가 화면에 반영된다. 이미지를 매번 새로 빌드하게 되므로 작업시간이 크다.
+
+Docker Volume이란?
+- 도커 컨에티너에서 Docker Volume을 이용하여 
+  기존의 COPY가 아닌 로컬에 있는파일을 Mapping하는것이다. 
+  ex) docker run -p 5000:8080 -v /usr/src/app/node_modules -v $(pwd):/usr/src/app imageId 
+      맥$(pwd) => 윈도우%cd% powerShell ${pwd}
+	  

@@ -141,3 +141,28 @@ Docker Volume이란?
   ex) docker run -p 5000:8080 -v /usr/src/app/node_modules -v $(pwd):/usr/src/app imageId 
       맥$(pwd) => 윈도우%cd% powerShell ${pwd}
 	  
+5/5
+Redis란?
+- Remote Dictionary Server로, 메모리 기반의 키-값 구조
+  데이터 관리 시스템. 모든 데이터를 메모리에 저장하고 빠르게 조회할수 있는 비관계형 데이터베이스(NoSql)
+  
+Redis를 왜 쓰는건가?
+- 메모리에 저장하기 때문에 기존RDBMS에 비해 조회가 빠르며, 메모리에 저장하지만 영속적으로 보관가능.
+  서버 재부팅해도 데이터 유지.
+  
+도커 환경에서 레디스 클라이언트 생성시 주의사항.
+- 도커를 사용하지 않는 환경은 레디스 서버가 작동되고있는 곳의 host옵션을 url로 주지만,
+  도커 Compose를 사용할때는 host옵션을 docker-compose.yml 파일에 명시한 컨테이너 이름으로 준다.
+	  
+컨테이너 작동순서
+- 레디스 클라이언트가 작동하려면 레디스 서버가 켜져 있어야 한다.
+  레디스 서버를 위한 컨테이너를 먼저 실행하고, 노드js를 위한 컨테이너를 실행한다.
+  docker run redis - 레디스 서버 실행
+  docker build -t ajw9491/docker-dompose-app ./ nodejs파일 이미지 생성
+  docker run ajw9491/docker-dompose-app
+- 서로 다른 컨테이너는 설정없이 접근이 불가능 하여 에러가 난다.
+  이때, 멀티 컨테이너 상황에서 쉽게 네트워크를 연결 시켜주기 위해 Docker Compose를 사용한다.
+ 
+docker-compose.yml작성
+ -yaml yml 파일은 XML,json처럼 데이터 형식 포맷이며, 좀 더 사람이 읽기 쉬운 포맷이다.
+ 
