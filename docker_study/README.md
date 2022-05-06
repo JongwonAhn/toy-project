@@ -167,3 +167,11 @@ docker-compose.yml작성
  -yaml yml 파일은 XML,json처럼 데이터 형식 포맷이며, 좀 더 사람이 읽기 쉬운 포맷이다.
  -docker-compose.yml 파일 주석 참고.
  -docker-compose up 로 실행.
+ 
+5/6
+  2시간동안 헤맸던 나.
+- redis 4.0.1버전에서 host프로퍼티 부분이 바뀌어, 오류가남. 우선 3.0.1버전 사용하자.
+- (root) Additional property node-app is not allowed
+   .yml 파일에서 띄어쓰기는 매우 중요하다. 이 부분이 오류일경우 나는 오류.
+- node.js express api 에서 res.send([body])의 인자값으론, Buffer obj, String, Array
+  만 보낼수 있다. Integer 값을 보내면 오류가 난다.

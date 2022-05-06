@@ -1,4 +1,4 @@
-FROM node:14
+FROM node:10
 
 WORKDIR /usr/src/app
 
@@ -6,4 +6,4 @@ COPY ./ ./
 
 RUN npm install
 
-CMD ["node", "server.js"]
+CMD [ "node", "server.js" ]
