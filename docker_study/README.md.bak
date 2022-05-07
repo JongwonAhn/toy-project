@@ -167,3 +167,27 @@ docker-compose.yml작성
  -yaml yml 파일은 XML,json처럼 데이터 형식 포맷이며, 좀 더 사람이 읽기 쉬운 포맷이다.
  -docker-compose.yml 파일 주석 참고.
  -docker-compose up 로 실행.
+ 
+5/6
+  2시간동안 헤맸던 나.
+- redis 4.0.1버전에서 host프로퍼티 부분이 바뀌어, 오류가남. 우선 3.0.1버전 사용하자.
+- (root) Additional property node-app is not allowed
+   .yml 파일에서 띄어쓰기는 매우 중요하다. 이 부분이 맞지 않을경우 발생
+- node.js express api 에서 res.send([body])의 인자값으론, Buffer obj, String, Array
+  만 보낼수 있다. Integer 값을 보내면 오류가 난다.
+  
+5/7
+- docker-compose down 종료
+- docker-compose up <d> 이미지가 없을때 이미지를 빌드하고 컨테이너 시작 <detached모드. 앱을 백그라운드에서 실행>
+- docker-compose up --build 이미지가 있든없든 이미지를 빌드하고 컨테이너 시작
+ 
+간단한 어플을 실제로 배포해보기.
+리액트 설치
+- npx create-react-app ./ 현재 디렉토리에 리액트 설치
+   현재node.js버전에서 지원하지 않아, 14버전 이상으로 업데이트하라고 오류메세지가 출력됬지만,
+   node.js를 지워도, 재설치해도, 업데이트해도 12.x버전이 출력됬다. where node를 입력하니
+   graalvm안에 node.cmd가 찍혔다. 가보니 graalvm이 node.js runtime도 같이 설치가 된것 같다
+   nodejs를 삭제후 재설치해도, 해당버전이 반영이 안된다. 혹시나 하고 nodejs환경변수를 graalvm위로 올렸다.
+   node -v 실행시, 최신버전node가 먼저 실행된다. -80분 소요ㅠㅠ
+ 
+ 
