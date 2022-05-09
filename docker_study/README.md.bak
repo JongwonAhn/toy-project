@@ -176,6 +176,7 @@ docker-compose.yml작성
 - node.js express api 에서 res.send([body])의 인자값으론, Buffer obj, String, Array
   만 보낼수 있다. Integer 값을 보내면 오류가 난다.
   
+
 5/7
 - docker-compose down 종료
 - docker-compose up <d> 이미지가 없을때 이미지를 빌드하고 컨테이너 시작 <detached모드. 앱을 백그라운드에서 실행>
@@ -188,6 +189,30 @@ docker-compose.yml작성
    node.js를 지워도, 재설치해도, 업데이트해도 12.x버전이 출력됬다. where node를 입력하니
    graalvm안에 node.cmd가 찍혔다. 가보니 graalvm이 node.js runtime도 같이 설치가 된것 같다
    nodejs를 삭제후 재설치해도, 해당버전이 반영이 안된다. 혹시나 하고 nodejs환경변수를 graalvm위로 올렸다.
-   node -v 실행시, 최신버전node가 먼저 실행된다. -80분 소요ㅠㅠ
+   node -v 실행시, 최신버전node가 먼저 실행된다. npm까지 정상적으로 버전업데이트가 되었다.  -80분 소요ㅠㅠ
  
- 
+ 5/9
+리액트 실행 명령어
+- npm run start 리액트 실행
+- npm run test 개발 완료후 테스트.
+- npm run build 테스트 완료 후 배포파일 생성
+
+도커를 이용하여 개발단계에서 리택트 실행
+- 현재까지는 Dockerfile을 하나만 만들었지만, 실제로는 개발단계과 실제 배포용 파일을 딷로 만든다.
+  개발환경과 실제 환경에서도 다르게 해줘야 하는 부분이 있기때문. 개발단게에선 Dockerfile.dev를 우선 만든다.
+
+docker build시 unable to evaluate symlink .. 에러
+- 이미지 빌드시, 해당 디렉토리만 지정해주면 dockerfile을 자동으로 찾아서 빌드 하지만, 현재 도커파일을 개발용인 dockerfile.dev로 만들었기에
+  dockerfile을찾지 못하여 발생. build시 임의로 참조할 파일을 알려줘야 한다.
+- docker build -f Dockerfile.dev . -> -f 옵션은 이미지를 빌드할때 쓰일 도커파일을 지정.
+
+도커를 이용한 리액트 앱에서 테스트 진행
+- 기존 npm run test -> modules가 한번더 copy되므로 삭제하였다. 
+- docker run 이미지이름 npm run test -> 도커 환경에서 리액트 엡 테스트.
+- test파일도 수정될경우, 즉시 반영될수 있도록 yml에 추가한다.
+
+개발환경 서버와 운영환경 서버를 왜 다르게 사용하나?
+- 개발에서 사용하는 서버는 소스를 변경시 자동으로 전체 앱을 다시 빌드해서 변경 소스를 반영해주는 것 같이 개발환경에 특화된 기능들이 있기에
+  그러한 기능이 없는 Nginx서버보다 더욱 적합하다.
+  운영환경은 개발에 필요한 기능들이 필요하지 않기에 Apache보다 단순하고, 깔끔한 동시접속처리에 특화된 Nginx를 사용한다.
+  
