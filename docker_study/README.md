@@ -1,4 +1,4 @@
-2022/05/02
+2022/05/02 1일차
 도커&쿠버네티스 라는 단어를 많이 들어봤다.
 도대체 무엇일까? 도커부터 직접 공부해보자.
 
@@ -63,7 +63,7 @@ nameSpace
   2. 도커 이미지에 있는 파일 스냅샷을 컨테이너 하드 디스크에 옮겨 준다.
   3. 이미지에서 가지고 있는 명령어(컨테이너가 실행될때 사용될 명령어)를 이용해 해당app을 실행시킨다.
 
-05/03 
+05/03 2일차
 작동 순서 복습.
 - docker run 이미지이름 명령어 -> 도커 클라이언트 언급 / 컨테이너 생성 및 실행 / 이 컨테이너를 위한 이미지 / 이 자리는 이미지가 가지고 있는 시작명령어를 무시하고 커맨드 실행시킴.
 
@@ -107,7 +107,7 @@ WSL2에 설치된 Linux에서 Dockerfile 빌드시 step등 정보가 terminal에
 - docker build <-t 나의도커아이디 / 저장소/프로젝트이름 : 버전> ./
   ex) docker build -t ajw9491/hello:latest ./ -> 도커이미지명으로 ajw9491/hello:latest 사용가능
  
-05/04
+05/04 3일차
 도커 빌드시
 - 종속성을 설치하기 위해선 해당 베이지 이미지가 그 종속성을 설치할수 있는 파일을 갖고 있어야 한다.
   ex) RUN npm install을 위해선 FROM node 를 사용하여야함.
@@ -141,7 +141,7 @@ Docker Volume이란?
   ex) docker run -p 5000:8080 -v /usr/src/app/node_modules -v $(pwd):/usr/src/app imageId 
       맥$(pwd) => 윈도우%cd% powerShell ${pwd}
 	  
-5/5
+5/5 4일차
 Redis란?
 - Remote Dictionary Server로, 메모리 기반의 키-값 구조
   데이터 관리 시스템. 모든 데이터를 메모리에 저장하고 빠르게 조회할수 있는 비관계형 데이터베이스(NoSql)
@@ -168,7 +168,7 @@ docker-compose.yml작성
  -docker-compose.yml 파일 주석 참고.
  -docker-compose up 로 실행.
  
-5/6
+5/6 5일차
   2시간동안 헤맸던 나.
 - redis 4.0.1버전에서 host프로퍼티 부분이 바뀌어, 오류가남. 우선 3.0.1버전 사용하자.
 - (root) Additional property node-app is not allowed
@@ -177,7 +177,7 @@ docker-compose.yml작성
   만 보낼수 있다. Integer 값을 보내면 오류가 난다.
   
 
-5/7
+5/7 6일차
 - docker-compose down 종료
 - docker-compose up <d> 이미지가 없을때 이미지를 빌드하고 컨테이너 시작 <detached모드. 앱을 백그라운드에서 실행>
 - docker-compose up --build 이미지가 있든없든 이미지를 빌드하고 컨테이너 시작
@@ -191,7 +191,7 @@ docker-compose.yml작성
    nodejs를 삭제후 재설치해도, 해당버전이 반영이 안된다. 혹시나 하고 nodejs환경변수를 graalvm위로 올렸다.
    node -v 실행시, 최신버전node가 먼저 실행된다. npm까지 정상적으로 버전업데이트가 되었다.  -80분 소요ㅠㅠ
  
- 5/9
+ 5/9 7일차
 리액트 실행 명령어
 - npm run start 리액트 실행
 - npm run test 개발 완료후 테스트.
@@ -219,3 +219,30 @@ docker build시 unable to evaluate symlink .. 에러
 운영환경을 위한 Dockerfile은 2단계로 이루어져 있다.
 - 1. 첫번째 단계는 빌드 파일들을 생성한다. (Builder Stage)
 - 2. 두번째 단계는 Nginx를 가동하고 첫번째 단계에서 생성된 빌드폴더의 파일들을 웹 브라우저의 요청에 따라 제공하여 준다. (Run Stage)
+
+5/10 8일차
+Nginx의 기본포트는 30번 이므로, Mapping시 30번 port를 매핑한다.
+새로 빌드 할 때 이름을 지정하지 않으면, 이전에 빌드된 ID의 이미지를 실행시킨다.
+
+github에 올린후, Travis CI에서 이 소스가 잘 작성된 코드인지 확인하기.
+Travis CI란?
+- github에서 제공하는 오픈소스 프로젝트로, Travis CI를 이용하여 github에 있는 repository에 있는 프로젝트를
+  특정 이벤트에 따라 자동으로 테스트, 빌드하거나 배포할수 있다. 단, Private repository는 유료. Public repository는 10000크레딧 무료
+  
+CI란?
+- Continuous Integration, 지속적 통합. 팀의 구성원들이 작업한 내용을 지속적으로 통합하여 품질 관리를 적용하는 프로세스.
+
+CI시스템을 구축하지 않으면?
+- 개발자들이 각자 개발한 소스코드를 형상관리 서버에 커밋하면, 별도의 품질관리를 거치지 않고 대부분 개발이 끝난 막바지에 통합을 하여 테스트를 진행하게 된다.
+  이경우, 개발중 별도의 품질 관리를 수행하지 않았기에 잘못된 소스코드를 형상관리 시스템에 반영하였을 경우 발생되는 문제가 개발 후반에 장애로 발견된다.
+  CI시스템을 구축하게 되면 CI서버는 형상관리 서버에 Commit된 소스를 주기적으로 Polling하여 컴파일, 단위테스트 등 테스트 과정을 수행하며
+  신규 또는 수정된 소스코드가 결함이 있는지 여부를 지속적으로 검증한다. 검증 결과는 이메일, RSS등의 피드백 매커니즘을 통해 개발자로 전달되고,
+  이를 통해 조기에 결함을 발견하여 해결할수 있는것이다.
+
+Travis CI의 flow
+- 로컬Git -> Github -> Travis CI -> AWS
+- 1. 로컬git소스를 github 저장소에 push
+- 2. github master 저장소에 소스가 push되면 Travis CI에게 소스가 push되었다고 알림.
+- 3. Travis CI는 업데이트 된 소스를 Github에서 가지고옴.
+- 4. github에서 가져온 소스의 테스트코드 실행
+- 5. 성공하면 AWS같은 호스팅 사이트로 보내어 배포
