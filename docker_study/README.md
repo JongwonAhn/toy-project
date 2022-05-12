@@ -246,3 +246,66 @@ Travis CI의 flow
 - 3. Travis CI는 업데이트 된 소스를 Github에서 가지고옴.
 - 4. github에서 가져온 소스의 테스트코드 실행
 - 5. 성공하면 AWS같은 호스팅 사이트로 보내어 배포
+
+5/11 9일차 - docker-react-app Repository
+Travis Ci 와 github 연결.
+- 1. Travis Ci 에서 github으로 로그인.
+- 2. 해당 repository 연결하여 활성화
+- 3. github에 한번더 push해야 Travis Ci에서 활성화가 된다.
+
+Travis Ci의 설정은 .travis.yml 파일에 작성한다.
+파일 작성후, github로 push할경우 .travis.yml 파일의 설정을 읽어 활성화시킨다.
+정상적으로 파일이 올라갈경우, 초록색으로 passed라고 나오며, .travis.yml의 설정 들이 log에 출력된다.
+//Trial Plan임에도 불구하고 1$ 뜯어감.
+
+5/12 10일차
+AWS에 대해
+EC2란 무엇인가?
+- Elastic Compute Cloud는 AWS클라우드에서 확장식 컴퓨팅 제공. EC2를 통해 원하는 만큼 가상 서버를 구축하고
+  보안 및 네트워크 구성과 스토리지 관리 가능. 신속하게 서버 규모를 확장하거나 축소가 가능.
+  쉽게말해, 컴퓨터를 임대하여 OS를설치 및 웹서비스를 위한 프로그램(서버,DB)을 설치 사용가능.
+  하나의 EC2 인스턴스가 하나의 컴퓨터 역할.
+  
+EB란 무엇인가?
+- Elastic Beanstalk은 Apache, Nginx같은 친숙한 서버에서 Java, PHP, Node.js, Docker등 함께 개발된
+  응용 프로그램 및 서비스를 배포하고 확장하기 쉬운 서비스이다.
+  EB는 EC2 인스턴스나 DB같은 많은것들을 포함한 환경을 구성하며 만들고있는 소프트웨어를 업데이트 할때마다 자동으로 이 환경을 괸리해준다.
+  트래픽이 많은경우, EB가 로드벨런서를 통해 EC2인스턴스를 나눠 부하를 자동으로 줄인다.
+  
+테스트에 성공한 소스를 AWS Elastic Beanstalk에 자동으로 배포하는 부분을 travis파일에 설정하기
+- .travis.yml 파일에 deploy 설정에 AWS관련정보 EB, S3정보를 추가.
+- 위 설정은, Travis CI에서 AWS에 어떤 파일을전해줄지, AWS에서 어떤 서비스를 이용할 것인지에 대한 설정이다.
+  하지만, Travis CI와 AWS가 실질적으로 소통 할수 있게 인증하는 부분을 설정하진 않았다.
+
+Travis CI의 AWS접근을 위한 API생성
+- GitHub -> Travis CI -> AWS
+- Travis CI아이디 로그인시 Github 연동으로 인증해주었다. 
+- AWS에서 제공해주는 Secret Key를 Travis의 yml파일에 적어주면, AWS로 접근이 가능.
+
+IAM User 생성
+IAM 이란?
+- Identity and Access Management로, AWS 리소스에 대한 엑세스를 안전하게 제어할수 있는 웹 서비스.
+  IAM을 사용하여 리소스를 사용하도록 인증(로그인) 및 권한부여 된 대상을 제어.
+  즉, 보안을 위해 Root사용자에서 IAM사용자를 만들어 부여한 권한만 가지고 있게한다.
+- AWS에서 AdministratorAccess-AWSElasticBeanStalk 정책을 선택한다. 정책 이름은 바뀔수 있다.
+- 발급받은 key는 직접 .yml에 노출시면 안되므로, 다른곳에 적고 그것을 가져와야 한다.
+  다른곳은, Travis Ci 사이트에 올린 repository의 Options에서 Environment Variables 에서
+  Add 하여, ACCESS KEY ID, SECRET ACCESS KEY를 넣어준다.
+- Travis CI에서 환경변수에 추가한 key들을 travis.yml파일에서 가져올수 있도록 추가한다.
+- 모든 deploy설정을 추가후 push할 경우, AWS에서 자동으로 배포되어 접속이 가능해진다.
+- 정삭적으로 작동되며, 개인 테스트용 이므로 꼭 작업을 환경종료 시켜서 과금이 더이상 안나가게 한다.
+- travis Ci 또한 테스트용이므로 build pushed를 off해준다.
+
+Docker를 이용한 복잡한 어플리케이션 만들기.
+지금까지는 도커를 이용하여 간단한 리액트 앱을 만들었지만, 실제로는 많은 부분의 BackSide Container를 사용한다.
+DB, Backend Server등 Multi Container를 사용하여 실무에 가까운 application을 만들어보기.
+//즉, 클라이언트에서 글을 입력하면, react를통해 node로 전달, Mysql로 전달되어 화면에 보여주는 app을 구현하자.
+
+Nginx의 Reverse Proxy
+- 리버스 프록시란 외부 클라이언트에서 서버로 접근시, 중간에서 중개자 역할을 하여 내부 서버로 접근할수 있도록 도와주는 서버이다.
+- 보안 -> 외부 사용자로부터 내부 망의 서버의 존재를 숨길수 있다. 모든 요청을 리버스 프록시 서버에서 받아
+        매핑되는 내부서버로 요청을 전달. url주소가 바뀌어도, 사용자는 그대로 접속가능
+- 로드벨런싱 -> 리버스 프록시 서버가 내부 서버에 대한 정보를 알고 있으므로, 각 서버의 상태에 따라 부하를 분산시켜 요청 전달 가능.
+
+
+  
